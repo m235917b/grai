@@ -8,28 +8,34 @@
 #ifndef INCLUDE_NEURON_HPP_
 #define INCLUDE_NEURON_HPP_
 
-#include <unordered_map>
+#include <memory>
 #include <vector>
 #include <functional>
-
-// TODO: check for possible pass by reference arguments
 
 class neuron {
 
 private:
-	float input_val;
+	std::array<float, 2> input_val = { 0.0f, 0.0f };
+	unsigned char recover = 0;
 	std::function<float(float)> activation;
 
 protected:
-	int recover_time;
+	unsigned char recover_time;
 	float bias;
-	std::unordered_map<neuron*, float> dendrites;
+	std::vector<std::pair<std::weak_ptr<neuron>, float>> dendrites;
 
 	neuron();
 
 	neuron(int recover_time, float bias,
-			std::unordered_map<neuron*, float> dendrites,
+			std::vector<std::pair<std::weak_ptr<neuron>, float>> &dendrites,
 			std::function<float(float)> activation);
+
+	neuron(int recover_time, float bias,
+			std::function<float(float)> activation);
+
+	void swap_inputs();
+
+	void stack_inputs();
 
 public:
 	neuron(const neuron &owner);
@@ -44,38 +50,29 @@ public:
 
 	void swap(neuron &other);
 
-	static neuron empty();
-
-	static neuron rand(std::vector<neuron*> network,
-			std::function<float(float)> activation);
+	static neuron rand(std::function<float(float)> activation);
 
 	static neuron init_full(int recover_time, float bias,
-			std::unordered_map<neuron*, float> dendrites,
+			std::vector<std::pair<std::weak_ptr<neuron>, float>> &dendrites,
 			std::function<float(float)> activation);
 
 	static neuron init(int recover_time, float bias,
 			std::function<float(float)> activation);
 
-	void set_activation(std::function<float(float)>);
-
 	void set_recover_time(int time);
 
 	void set_bias(float value);
 
-	void set_dendrites(std::unordered_map<neuron*, float> dendrites);
+	void set_dendrites(
+			std::vector<std::pair<std::weak_ptr<neuron>, float>> &dendrites);
 
-	void mutate();
+	void push_dendrite(std::weak_ptr<neuron> n, float weight);
 
-	void mutate(std::vector<neuron*> network);
-
-	void mutate(std::vector<std::function<float(float)>> activation_functions);
-
-	void mutate(std::vector<neuron*> network,
-			std::vector<std::function<float(float)>> activation_functions);
+	void delete_dendrite(std::weak_ptr<neuron> n);
 
 	void input(float value);
 
-	void fire();
+	std::function<void()> fire();
 
 	std::string to_string();
 
