@@ -30,14 +30,17 @@ neuron::neuron() :
 		activation([](float x) {
 			return 0.0f;
 		}), recover_time(0), bias(0.0f), dendrites(
-				std::vector<std::pair<std::weak_ptr<neuron>, float>>()) {
+				std::unordered_map<std::reference_wrapper<neuron>, float,
+						ref_wrapper_hash, ref_wrapper_equal>()) {
 }
 
 neuron::neuron(int recover_time, float bias,
-		std::vector<std::pair<std::weak_ptr<neuron>, float>> &dendrites,
+		std::unordered_map<std::reference_wrapper<neuron>, float,
+				ref_wrapper_hash, ref_wrapper_equal> &dendrites,
 		std::function<float(float)> activation) :
 		activation(activation), recover_time(recover_time), bias(bias), dendrites(
-				std::vector<std::pair<std::weak_ptr<neuron>, float>>()) {
+				std::unordered_map<std::reference_wrapper<neuron>, float,
+						ref_wrapper_hash, ref_wrapper_equal>()) {
 	neuron::dendrites = dendrites;
 }
 
@@ -101,7 +104,8 @@ neuron neuron::rand(std::function<float(float)> activation) {
 }
 
 neuron neuron::init_full(int recover_time, float bias,
-		std::vector<std::pair<std::weak_ptr<neuron>, float>> &dendrites,
+		std::unordered_map<std::reference_wrapper<neuron>, float,
+				ref_wrapper_hash, ref_wrapper_equal> &dendrites,
 		std::function<float(float)> activation) {
 	return neuron(recover_time, bias, dendrites, activation);
 }
@@ -120,20 +124,21 @@ void neuron::set_bias(float value) {
 }
 
 void neuron::set_dendrites(
-		std::vector<std::pair<std::weak_ptr<neuron>, float>> &dendrites) {
-	neuron::dendrites = std::vector<std::pair<std::weak_ptr<neuron>, float>>();
+		std::unordered_map<std::reference_wrapper<neuron>, float,
+				ref_wrapper_hash, ref_wrapper_equal> &dendrites) {
+	neuron::dendrites = std::unordered_map<std::reference_wrapper<neuron>,
+			float, ref_wrapper_hash, ref_wrapper_equal>();
 	neuron::dendrites = dendrites;
 }
 
-void neuron::push_dendrite(std::weak_ptr<neuron> n, float weight) {
-	dendrites.push_back(std::pair<std::weak_ptr<neuron>, float>(n, weight));
+void neuron::push_dendrite(neuron &n, float weight) {
+	dendrites.insert(
+			std::pair<std::reference_wrapper<neuron>, float>(std::ref(n),
+					weight));
 }
 
-void neuron::delete_dendrite(std::weak_ptr<neuron> n) {
-	auto it = std::remove_if(dendrites.begin(), dendrites.end(), [&](auto p) {
-		return p.first.lock() == n.lock();
-	});
-	dendrites.erase(it, dendrites.end());
+void neuron::delete_dendrite(neuron &n) {
+	dendrites.erase(std::ref(n));
 }
 
 void neuron::input(float value) {
@@ -156,7 +161,7 @@ std::function<void()> neuron::fire() {
 
 		if (activation(input_val[0]) >= bias) {
 			std::for_each(dendrites.begin(), dendrites.end(), [](auto p) {
-				p.first.lock()->input(p.second);
+				p.first.get().input(p.second);
 			});
 		}
 
