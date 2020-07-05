@@ -8,16 +8,12 @@
 #include <utility>
 #include <random>
 #include <chrono>
-#include "../include/neuron.hpp"
+#include <neuron.hpp>
 
 std::minstd_rand random_generator(
 		std::chrono::system_clock::now().time_since_epoch().count());
 
 // non-member functions
-
-void swap(neuron &n1, neuron &n2) {
-	n1.swap(n2);
-}
 
 float random(float max) {
 	return (static_cast<float>(random_generator() - random_generator.min())
@@ -29,19 +25,7 @@ float random(float max) {
 neuron::neuron() :
 		activation([](float x) {
 			return 0.0f;
-		}), recover_time(0), bias(0.0f), dendrites(
-				std::unordered_map<std::reference_wrapper<neuron>, float,
-						ref_wrapper_hash, ref_wrapper_equal>()) {
-}
-
-neuron::neuron(int recover_time, float bias,
-		std::unordered_map<std::reference_wrapper<neuron>, float,
-				ref_wrapper_hash, ref_wrapper_equal> &dendrites,
-		std::function<float(float)> activation) :
-		activation(activation), recover_time(recover_time), bias(bias), dendrites(
-				std::unordered_map<std::reference_wrapper<neuron>, float,
-						ref_wrapper_hash, ref_wrapper_equal>()) {
-	neuron::dendrites = dendrites;
+		}), recover_time(0), bias(0.0f) {
 }
 
 neuron::neuron(int recover_time, float bias,
@@ -51,7 +35,7 @@ neuron::neuron(int recover_time, float bias,
 
 neuron::neuron(const neuron &owner) :
 		activation(owner.activation), recover_time(owner.recover_time), bias(
-				owner.bias), dendrites(owner.dendrites) {
+				owner.bias) {
 }
 
 neuron::neuron(neuron &&owner) noexcept {
@@ -60,7 +44,6 @@ neuron::neuron(neuron &&owner) noexcept {
 	std::swap(activation, owner.activation);
 	std::swap(recover_time, owner.recover_time);
 	std::swap(bias, owner.bias);
-	std::swap(dendrites, owner.dendrites);
 }
 
 neuron::~neuron() {
@@ -73,7 +56,6 @@ neuron& neuron::operator=(const neuron &that) {
 		activation = that.activation;
 		recover_time = that.recover_time;
 		bias = that.bias;
-		dendrites = that.dendrites;
 	}
 
 	return *this;
@@ -85,29 +67,12 @@ neuron& neuron::operator=(neuron &&that) {
 	std::swap(activation, that.activation);
 	std::swap(recover_time, that.recover_time);
 	std::swap(bias, that.bias);
-	std::swap(dendrites, that.dendrites);
 
 	return *this;
 }
 
-void neuron::swap(neuron &other) {
-	std::swap(input_val, other.input_val);
-	std::swap(recover, other.recover);
-	std::swap(activation, other.activation);
-	std::swap(recover_time, other.recover_time);
-	std::swap(bias, other.bias);
-	std::swap(dendrites, other.dendrites);
-}
-
 neuron neuron::rand(std::function<float(float)> activation) {
 	return neuron(random(2.5f) + 2.5f, random(10.0f), activation);
-}
-
-neuron neuron::init_full(int recover_time, float bias,
-		std::unordered_map<std::reference_wrapper<neuron>, float,
-				ref_wrapper_hash, ref_wrapper_equal> &dendrites,
-		std::function<float(float)> activation) {
-	return neuron(recover_time, bias, dendrites, activation);
 }
 
 neuron neuron::init(int recover_time, float bias,
@@ -123,52 +88,26 @@ void neuron::set_bias(float value) {
 	bias = value;
 }
 
-void neuron::set_dendrites(
-		std::unordered_map<std::reference_wrapper<neuron>, float,
-				ref_wrapper_hash, ref_wrapper_equal> &dendrites) {
-	neuron::dendrites = std::unordered_map<std::reference_wrapper<neuron>,
-			float, ref_wrapper_hash, ref_wrapper_equal>();
-	neuron::dendrites = dendrites;
-}
-
-void neuron::push_dendrite(neuron &n, float weight) {
-	dendrites.insert(
-			std::pair<std::reference_wrapper<neuron>, float>(std::ref(n),
-					weight));
-}
-
-void neuron::delete_dendrite(neuron &n) {
-	dendrites.erase(std::ref(n));
-}
-
 void neuron::input(float value) {
 	input_val[1] += value;
 }
 
 void neuron::swap_inputs() {
-	neuron::input_val[0] = neuron::input_val[1];
-	neuron::input_val[1] = 0.0f;
-}
+	if (recover-- == 0) {
+		recover = recover_time;
 
-void neuron::stack_inputs() {
+		neuron::input_val[0] = neuron::input_val[1];
+		neuron::input_val[1] = 0.0f;
+
+		return;
+	}
+
 	neuron::input_val[0] += neuron::input_val[1];
 	neuron::input_val[1] = 0.0f;
 }
 
-std::function<void()> neuron::fire() {
-	if (recover-- == 0) {
-		recover = recover_time;
-
-		if (activation(input_val[0]) >= bias) {
-			std::for_each(dendrites.begin(), dendrites.end(), [](auto p) {
-				p.first.get().input(p.second);
-			});
-		}
-
-		return std::bind(swap_inputs, this);
-	}
-
-	return std::bind(stack_inputs, this);
+bool neuron::fire() {
+	return recover == 0 && activation(input_val[0]) >= bias;
 }
 
 std::string neuron::to_string() {
@@ -177,4 +116,3 @@ std::string neuron::to_string() {
 			+ std::to_string(input_val[0]) + ", " + std::to_string(input_val[1])
 			+ "}]";
 }
-
