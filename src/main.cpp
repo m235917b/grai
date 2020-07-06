@@ -179,63 +179,54 @@ void test_graph() {
 	net.add_edge(2, 5, -0.24f);
 	net.add_edge(2, 6, 1.212f);
 
-	std::cout << net.get_vert(0).to_string() << "\n";
-	std::cout << net.get_vert(1).to_string() << "\n";
-	std::cout << net.get_vert(2).to_string() << "\n";
-	std::cout << net.get_vert(3).to_string() << "\n";
-	std::cout << net.get_vert(4).to_string() << "\n";
-	std::cout << net.get_vert(5).to_string() << "\n";
-	std::cout << net.get_vert(6).to_string() << "\n";
-	std::cout << "----------\n";
-
 	auto start = std::chrono::high_resolution_clock::now();
 
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 10000000000; ++i) {
 
-		net.get_vert(0).input(3.2f);
+		net.get_vertex(0).input(3.2f);
 
 		net.for_each_by_vert(
 				[&](neuron &n, std::vector<std::pair<int, float> > &edges) {
 					if (n.fire()) {
 						std::for_each(edges.begin(), edges.end(), [&](auto &p) {
-							net.get_vert(p.first).input(p.second);
+							net.get_vertex(p.first).input(p.second);
 						});
 					}
 				});
 
-		std::cout << net.get_vert(0).to_string() << "\n";
-		std::cout << net.get_vert(1).to_string() << "\n";
-		std::cout << net.get_vert(2).to_string() << "\n";
-		std::cout << net.get_vert(3).to_string() << "\n";
-		std::cout << net.get_vert(4).to_string() << "\n";
-		std::cout << net.get_vert(5).to_string() << "\n";
-		std::cout << net.get_vert(6).to_string() << "\n";
-		std::cout << "->\n";
+//		std::cout << net.get_vertex(0).to_string() << "\n";
+//		std::cout << net.get_vertex(1).to_string() << "\n";
+//		std::cout << net.get_vertex(2).to_string() << "\n";
+//		std::cout << net.get_vertex(3).to_string() << "\n";
+//		std::cout << net.get_vertex(4).to_string() << "\n";
+//		std::cout << net.get_vertex(5).to_string() << "\n";
+//		std::cout << net.get_vertex(6).to_string() << "\n";
+//		std::cout << "->\n";
 
 		net.for_each_vert([](neuron &n) {
 			n.swap_inputs();
 		});
 
-		std::cout << net.get_vert(0).to_string() << "\n";
-		std::cout << net.get_vert(1).to_string() << "\n";
-		std::cout << net.get_vert(2).to_string() << "\n";
-		std::cout << net.get_vert(3).to_string() << "\n";
-		std::cout << net.get_vert(4).to_string() << "\n";
-		std::cout << net.get_vert(5).to_string() << "\n";
-		std::cout << net.get_vert(6).to_string() << "\n";
-		std::cout << "----------\n";
+//		std::cout << net.get_vertex(0).to_string() << "\n";
+//		std::cout << net.get_vertex(1).to_string() << "\n";
+//		std::cout << net.get_vertex(2).to_string() << "\n";
+//		std::cout << net.get_vertex(3).to_string() << "\n";
+//		std::cout << net.get_vertex(4).to_string() << "\n";
+//		std::cout << net.get_vertex(5).to_string() << "\n";
+//		std::cout << net.get_vertex(6).to_string() << "\n";
+//		std::cout << "----------\n";
 	}
 
 	auto finish = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::micro> elapsed = finish - start;
 
-	std::cout << net.get_vert(0).to_string() << "\n";
-	std::cout << net.get_vert(1).to_string() << "\n";
-	std::cout << net.get_vert(2).to_string() << "\n";
-	std::cout << net.get_vert(3).to_string() << "\n";
-	std::cout << net.get_vert(4).to_string() << "\n";
-	std::cout << net.get_vert(5).to_string() << "\n";
-	std::cout << net.get_vert(6).to_string() << "\n";
+	std::cout << net.get_vertex(0).to_string() << "\n";
+	std::cout << net.get_vertex(1).to_string() << "\n";
+	std::cout << net.get_vertex(2).to_string() << "\n";
+	std::cout << net.get_vertex(3).to_string() << "\n";
+	std::cout << net.get_vertex(4).to_string() << "\n";
+	std::cout << net.get_vertex(5).to_string() << "\n";
+	std::cout << net.get_vertex(6).to_string() << "\n";
 	std::cout << elapsed.count() << "\n\n----------\n\n";
 }
 
