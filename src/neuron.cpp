@@ -16,8 +16,8 @@ std::minstd_rand random_generator(
 // non-member functions
 
 float random(float max) {
-	return (static_cast<float>(random_generator() - random_generator.min())
-			/ random_generator.max() - 0.5f) * 2 * max;
+	return ((static_cast<float>(random_generator() - random_generator.min())
+			/ random_generator.max() - 0.5f) * 2 * max);
 }
 
 // member functions
@@ -62,11 +62,13 @@ neuron& neuron::operator=(const neuron &that) {
 }
 
 neuron& neuron::operator=(neuron &&that) {
-	std::swap(input_val, that.input_val);
-	std::swap(recover, that.recover);
-	std::swap(activation, that.activation);
-	std::swap(recover_time, that.recover_time);
-	std::swap(bias, that.bias);
+	if (this != &that) {
+		std::swap(input_val, that.input_val);
+		std::swap(recover, that.recover);
+		std::swap(activation, that.activation);
+		std::swap(recover_time, that.recover_time);
+		std::swap(bias, that.bias);
+	}
 
 	return *this;
 }
