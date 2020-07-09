@@ -189,7 +189,7 @@ void test_graph() {
 
 		net.for_each(
 				[&](neuron &n,
-						std::vector<std::pair<unsigned int, float> > &edges) {
+						std::vector<std::pair<std::size_t, float> > &edges) {
 					if (n.fire()) {
 						std::for_each(edges.begin(), edges.end(), [&](auto &p) {
 							net.get_vertex(p.first).input(p.second);
@@ -234,10 +234,10 @@ void test_graph() {
 }
 
 int main() {
-	test();
-	speed_test();
+	//test();
+	//speed_test();
 	run_tests();
-	test_graph();
+	//test_graph();
 
 	return 0;
 }
