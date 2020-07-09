@@ -12,134 +12,9 @@
 #include <graph.hpp>
 #include <test.hpp>
 
-void test() {
-	/*auto n(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
+void speed_test_graph() {
+	int it = 100000000;
 
-	 auto n0(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n1(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n2(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n3(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 n->push_dendrite(*n1, 1.7f);
-	 n0->push_dendrite(*n1, 1.234f);
-	 n1->push_dendrite(*n2, 0.3f);
-	 n2->push_dendrite(*n1, -0.3f);
-	 n2->push_dendrite(*n3, 4.1f);
-
-	 n2->delete_dendrite(*n3);
-
-	 n->input(3.2f);
-
-	 std::cout << n->to_string() << "\n";
-	 std::cout << n0->to_string() << "\n";
-	 std::cout << n1->to_string() << "\n";
-	 std::cout << n2->to_string() << "\n";
-	 std::cout << n3->to_string() << "\n\n";
-
-	 for (int i = 0; i < 10; ++i) {
-
-	 auto funcs = std::vector<std::function<void()>>();
-
-	 funcs.push_back(n->fire());
-	 funcs.push_back(n0->fire());
-	 funcs.push_back(n1->fire());
-	 funcs.push_back(n2->fire());
-	 funcs.push_back(n3->fire());
-
-	 std::for_each(funcs.begin(), funcs.end(), [](auto f) {
-	 f();
-	 });
-
-	 funcs.clear();
-
-	 std::cout << n->to_string() << "\n";
-	 std::cout << n0->to_string() << "\n";
-	 std::cout << n1->to_string() << "\n";
-	 std::cout << n2->to_string() << "\n";
-	 std::cout << n3->to_string() << "\n\n----------\n\n";
-	 }*/
-}
-
-void speed_test() {
-	/*auto n0(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n1(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n2(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n3(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n4(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n5(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 auto n6(std::make_shared<neuron>(neuron::rand([](float x) {
-	 return x;
-	 })));
-
-	 std::vector<std::shared_ptr<neuron>> net = { n0, n1, n2, n3, n4, n5, n6 };
-
-	 n0->push_dendrite(*n1, 2);
-	 n0->push_dendrite(*n2, 3);
-	 n1->push_dendrite(*n3, -2);
-	 n1->push_dendrite(*n4, 21);
-	 n2->push_dendrite(*n5, -20);
-	 n2->push_dendrite(*n6, 12);
-
-	 auto start = std::chrono::high_resolution_clock::now();
-
-	 for (int i = 0; i < 1000000; ++i) {
-
-	 n0->input(32);
-
-	 std::for_each(net.begin(), net.end(), [&](auto ptr) {
-	 ptr->fire();
-	 });
-
-	 std::for_each(net.begin(), net.end(), [&](auto ptr) {
-	 ptr->swap_inputs();
-	 });
-	 }
-
-	 auto finish = std::chrono::high_resolution_clock::now();
-	 std::chrono::duration<double, std::micro> elapsed = finish - start;
-
-	 std::cout << n0->to_string() << "\n";
-	 std::cout << n1->to_string() << "\n";
-	 std::cout << n2->to_string() << "\n";
-	 std::cout << n3->to_string() << "\n";
-	 std::cout << n4->to_string() << "\n";
-	 std::cout << n5->to_string() << "\n";
-	 std::cout << n6->to_string() << "\n";
-	 std::cout << elapsed.count() << "\n\n----------\n\n";*/
-}
-
-void test_graph() {
 	auto neurons = std::vector<neuron>();
 
 	neurons.push_back(neuron::rand([](float x) {
@@ -172,8 +47,6 @@ void test_graph() {
 
 	auto net = graph<neuron, float>::from_vertices(neurons);
 
-	net.insert(neurons[0]);
-
 	net.add_edge(0, 1, 0.22f);
 	net.add_edge(0, 2, 0.37f);
 	net.add_edge(1, 3, -2.25f);
@@ -182,6 +55,87 @@ void test_graph() {
 	net.add_edge(2, 6, 1.212f);
 
 	auto start = std::chrono::high_resolution_clock::now();
+
+	std::cout << "----- Speed Test Network -----\n";
+	std::cout << net.get_vertex(0).to_string() << "\n";
+	std::cout << net.get_vertex(1).to_string() << "\n";
+	std::cout << net.get_vertex(2).to_string() << "\n";
+	std::cout << net.get_vertex(3).to_string() << "\n";
+	std::cout << net.get_vertex(4).to_string() << "\n";
+	std::cout << net.get_vertex(5).to_string() << "\n";
+	std::cout << net.get_vertex(6).to_string() << "\n";
+	std::cout << "->\n";
+
+	for (int i = 0; i < it; ++i) {
+
+		net.get_vertex(0).input(3.2f);
+
+		net.for_each(
+				[&](neuron &n,
+						std::vector<std::pair<std::size_t, float> > &edges) {
+					if (n.fire()) {
+						std::for_each(edges.begin(), edges.end(), [&](auto &p) {
+							net.get_vertex(p.first).input(p.second);
+						});
+					}
+				});
+
+		net.for_each_vert([](neuron &n) {
+			n.swap_inputs();
+		});
+	}
+
+	auto finish = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::micro> elapsed = finish - start;
+
+	std::cout << net.get_vertex(0).to_string() << "\n";
+	std::cout << net.get_vertex(1).to_string() << "\n";
+	std::cout << net.get_vertex(2).to_string() << "\n";
+	std::cout << net.get_vertex(3).to_string() << "\n";
+	std::cout << net.get_vertex(4).to_string() << "\n";
+	std::cout << net.get_vertex(5).to_string() << "\n";
+	std::cout << net.get_vertex(6).to_string() << "\n\n";
+	std::cout << "Elapsed time for " << it << " iterations: "
+			<< elapsed.count() / 1000000 << " seconds\n\n";
+}
+
+void test_graph() {
+	auto neurons = std::vector<neuron>();
+
+	neurons.push_back(neuron::rand([](float x) {
+		return x;
+	}));
+
+	neurons.push_back(neuron::rand([](float x) {
+		return x;
+	}));
+
+	neurons.push_back(neuron::rand([](float x) {
+		return x;
+	}));
+
+	neurons.push_back(neuron::rand([](float x) {
+		return x;
+	}));
+
+	neurons.push_back(neuron::rand([](float x) {
+		return x;
+	}));
+
+	neurons.push_back(neuron::rand([](float x) {
+		return x;
+	}));
+
+	auto net = graph<neuron, float>::from_vertices(neurons);
+
+	net.add_edge(0, 1, 0.22f);
+	net.add_edge(1, 2, 0.37f);
+	net.add_edge(2, 3, -2.25f);
+	net.add_edge(2, 1, 2.123f);
+	net.add_edge(3, 4, -0.24f);
+	net.add_edge(3, 5, 1.212f);
+
+	std::cout << "----- Start Network Test -----\n";
 
 	for (int i = 0; i < 10; ++i) {
 
@@ -203,7 +157,6 @@ void test_graph() {
 		std::cout << net.get_vertex(3).to_string() << "\n";
 		std::cout << net.get_vertex(4).to_string() << "\n";
 		std::cout << net.get_vertex(5).to_string() << "\n";
-		std::cout << net.get_vertex(6).to_string() << "\n";
 		std::cout << "->\n";
 
 		net.for_each_vert([](neuron &n) {
@@ -216,28 +169,16 @@ void test_graph() {
 		std::cout << net.get_vertex(3).to_string() << "\n";
 		std::cout << net.get_vertex(4).to_string() << "\n";
 		std::cout << net.get_vertex(5).to_string() << "\n";
-		std::cout << net.get_vertex(6).to_string() << "\n";
 		std::cout << "----------\n";
 	}
 
-	auto finish = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double, std::micro> elapsed = finish - start;
-
-	std::cout << net.get_vertex(0).to_string() << "\n";
-	std::cout << net.get_vertex(1).to_string() << "\n";
-	std::cout << net.get_vertex(2).to_string() << "\n";
-	std::cout << net.get_vertex(3).to_string() << "\n";
-	std::cout << net.get_vertex(4).to_string() << "\n";
-	std::cout << net.get_vertex(5).to_string() << "\n";
-	std::cout << net.get_vertex(6).to_string() << "\n";
-	std::cout << elapsed.count() << "\n\n----------\n\n";
+	std::cout << "\n";
 }
 
 int main() {
-	//test();
-	//speed_test();
+	speed_test_graph();
 	run_tests();
-	//test_graph();
+	test_graph();
 
 	return 0;
 }
