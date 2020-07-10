@@ -8,9 +8,182 @@
 #include <iostream>
 #include <chrono>
 #include <memory>
-#include <neuron.hpp>
 #include <graph.hpp>
+#include <neuron.hpp>
+#include <neuron_graph.hpp>
 #include <test.hpp>
+
+void speed_test_neuron_graph() {
+	int it = 100000000;
+
+	auto neurons = std::vector<std::unique_ptr<neuron_graph>>();
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons[0]->push_dendrite(*neurons[1], 0.22f);
+	neurons[0]->push_dendrite(*neurons[2], 0.37f);
+	neurons[1]->push_dendrite(*neurons[3], -2.25f);
+	neurons[1]->push_dendrite(*neurons[4], 2.123f);
+	neurons[2]->push_dendrite(*neurons[5], -0.24f);
+	neurons[2]->push_dendrite(*neurons[6], 1.212f);
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	std::cout << "----- Speed Test neuron_graph -----\n";
+	std::cout << neurons[0]->to_string() << "\n";
+	std::cout << neurons[1]->to_string() << "\n";
+	std::cout << neurons[2]->to_string() << "\n";
+	std::cout << neurons[3]->to_string() << "\n";
+	std::cout << neurons[4]->to_string() << "\n";
+	std::cout << neurons[5]->to_string() << "\n";
+	std::cout << neurons[6]->to_string() << "\n";
+	std::cout << "->\n";
+
+	for (int i = 0; i < it; ++i) {
+
+		neurons[0]->input(3.2f);
+
+		for (auto &n : neurons) {
+			n->fire();
+		}
+
+		for (auto &n : neurons) {
+			n->swap_inputs();
+		}
+	}
+
+	auto finish = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::micro> elapsed = finish - start;
+
+	std::cout << neurons[0]->to_string() << "\n";
+	std::cout << neurons[1]->to_string() << "\n";
+	std::cout << neurons[2]->to_string() << "\n";
+	std::cout << neurons[3]->to_string() << "\n";
+	std::cout << neurons[4]->to_string() << "\n";
+	std::cout << neurons[5]->to_string() << "\n";
+	std::cout << neurons[6]->to_string() << "\n\n";
+	std::cout << "Elapsed time for " << it << " iterations: "
+			<< elapsed.count() / 1000000 << " seconds\n\n";
+}
+
+void test_neuron_graph() {
+	int it = 10;
+
+	auto neurons = std::vector<std::unique_ptr<neuron_graph>>();
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons.push_back(
+			std::make_unique<neuron_graph>(neuron_graph::rand([](float x) {
+				return x;
+			})));
+
+	neurons[0]->push_dendrite(*neurons[1], 0.22f);
+	neurons[0]->push_dendrite(*neurons[2], 0.37f);
+	neurons[1]->push_dendrite(*neurons[3], -2.25f);
+	neurons[1]->push_dendrite(*neurons[4], 2.123f);
+	neurons[2]->push_dendrite(*neurons[5], -0.24f);
+	neurons[2]->push_dendrite(*neurons[6], 1.212f);
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	std::cout << "----- Test neuron_graph -----\n";
+
+	for (int i = 0; i < it; ++i) {
+		neurons[0]->input(3.2f);
+
+		for (auto &n : neurons) {
+			n->fire();
+		}
+
+		std::cout << neurons[0]->to_string() << "\n";
+		std::cout << neurons[1]->to_string() << "\n";
+		std::cout << neurons[2]->to_string() << "\n";
+		std::cout << neurons[3]->to_string() << "\n";
+		std::cout << neurons[4]->to_string() << "\n";
+		std::cout << neurons[5]->to_string() << "\n";
+		std::cout << neurons[6]->to_string() << "\n";
+		std::cout << "->\n";
+
+		for (auto &n : neurons) {
+			n->swap_inputs();
+		}
+
+		std::cout << neurons[0]->to_string() << "\n";
+		std::cout << neurons[1]->to_string() << "\n";
+		std::cout << neurons[2]->to_string() << "\n";
+		std::cout << neurons[3]->to_string() << "\n";
+		std::cout << neurons[4]->to_string() << "\n";
+		std::cout << neurons[5]->to_string() << "\n";
+		std::cout << neurons[6]->to_string() << "\n----------\n";
+	}
+
+	auto finish = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::micro> elapsed = finish - start;
+
+	std::cout << "\n";
+}
 
 void speed_test_graph() {
 	int it = 100000000;
@@ -176,9 +349,11 @@ void test_graph() {
 }
 
 int main() {
-	speed_test_graph();
+	//speed_test_graph();
+	speed_test_neuron_graph();
 	run_tests();
-	test_graph();
+	//test_graph();
+	//test_neuron_graph();
 
 	return 0;
 }

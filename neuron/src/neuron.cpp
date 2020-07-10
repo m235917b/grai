@@ -10,12 +10,12 @@
 #include <chrono>
 #include <neuron.hpp>
 
-std::minstd_rand random_generator(
+static std::minstd_rand random_generator(
 		std::chrono::system_clock::now().time_since_epoch().count());
 
 // non-member functions
 
-float random(float max) {
+float static random(float max) {
 	return ((static_cast<float>(random_generator() - random_generator.min())
 			/ random_generator.max() - 0.5f) * 2 * max);
 }
@@ -31,46 +31,6 @@ neuron::neuron() :
 neuron::neuron(int recover_time, float bias,
 		std::function<float(float)> activation) :
 		activation(activation), recover_time(recover_time), bias(bias) {
-}
-
-neuron::neuron(const neuron &owner) :
-		activation(owner.activation), recover_time(owner.recover_time), bias(
-				owner.bias) {
-}
-
-neuron::neuron(neuron &&owner) noexcept {
-	std::swap(input_val, owner.input_val);
-	std::swap(recover, owner.recover);
-	std::swap(activation, owner.activation);
-	std::swap(recover_time, owner.recover_time);
-	std::swap(bias, owner.bias);
-}
-
-neuron::~neuron() {
-}
-
-neuron& neuron::operator=(const neuron &that) {
-	if (this != &that) {
-		input_val = that.input_val;
-		recover = that.recover;
-		activation = that.activation;
-		recover_time = that.recover_time;
-		bias = that.bias;
-	}
-
-	return *this;
-}
-
-neuron& neuron::operator=(neuron &&that) {
-	if (this != &that) {
-		std::swap(input_val, that.input_val);
-		std::swap(recover, that.recover);
-		std::swap(activation, that.activation);
-		std::swap(recover_time, that.recover_time);
-		std::swap(bias, that.bias);
-	}
-
-	return *this;
 }
 
 neuron neuron::rand(std::function<float(float)> activation) {

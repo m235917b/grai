@@ -28,15 +28,15 @@ protected:
 			std::function<float(float)> activation);
 
 public:
-	neuron(const neuron &owner);
+	~neuron() noexcept = default;
 
-	neuron(neuron &&owner) noexcept;
+	neuron(const neuron &owner) = default;
 
-	~neuron();
+	neuron(neuron &&owner) noexcept = default;
 
-	neuron& operator=(const neuron &that);
+	neuron& operator=(const neuron &that) = default;
 
-	neuron& operator=(neuron &&that);
+	neuron& operator=(neuron &&that) noexcept = default;
 
 	static neuron rand(std::function<float(float)> activation);
 
